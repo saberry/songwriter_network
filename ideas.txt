@@ -1,0 +1,11 @@
+What to test in temporal network
+flexibility, promiscuity, temporal degree centrality, burstiness
+
+The burstiness coefficent, B, is defined in refs [1,2] as:
+
+ 
+Where 
+ and 
+ are the standard deviation and mean of the inter-contact times respectively (see teneto.networkmeasures.intercontacttimes)
+
+When B > 0, indicates bursty intercontact times. When B < 0, indicates periodic/tonic intercontact times. When B = 0, indicates random.
