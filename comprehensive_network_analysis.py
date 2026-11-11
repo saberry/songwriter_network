@@ -175,6 +175,11 @@ joblib.dump(
     "network_analysis_results.pkl"
 )
 
+import joblib
+louvain_communities, modularity, assortativity, promiscuity_scores, betweeness_centrality, degree_centrality, clustering_coefficient = joblib.load("network_analysis_results.pkl")
+
+
+
 # NODE-LEVEL MEASURES
 # Temporal Closeness Centrality
 closeness_dict = temporal_closeness_centrality(tnet)

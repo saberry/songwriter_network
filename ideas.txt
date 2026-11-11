@@ -25,3 +25,6 @@ When B > 0, indicates bursty intercontact times. When B < 0, indicates periodic/
 Strong communities will emerge, with strong modularity (.5)
 Strong performance (.95) and strong coverage (.63)
 Promiscuity will be normally distributed. - Not supported
+-mean is .26, std is .29
+
+Find average songwriter performance (measured at peak) and how centrality influences performance.
