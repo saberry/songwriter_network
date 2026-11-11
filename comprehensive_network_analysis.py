@@ -178,6 +178,15 @@ joblib.dump(
 import joblib
 louvain_communities, modularity, assortativity, promiscuity_scores, betweeness_centrality, degree_centrality, clustering_coefficient = joblib.load("network_analysis_results.pkl")
 
+import scipy.stats as stats
+promiscuity_df = pd.DataFrame(list(promiscuity_scores.items()), columns=['Node', 'Promiscuity'])
+sns.histplot(promiscuity_df['Promiscuity'], bins=20, color = '#640d0d')
+plt.title("Distribution of Promiscuity Scores")
+plt.show()
+
+standardized_data = (promiscuity_df['Promiscuity'] - promiscuity_df['Promiscuity'].mean()) / promiscuity_df['Promiscuity'].std()
+ks_stat, ks_p = stats.kstest(standardized_data.dropna(), 'norm')
+print(f"KS Test P-value: {ks_p}")
 
 
 # NODE-LEVEL MEASURES

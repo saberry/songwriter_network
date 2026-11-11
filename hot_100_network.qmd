@@ -1,7 +1,13 @@
 ---
 title: "Promiscuity and The Billboard Hot 100"
 subtitle: "Assessing Songwriter Network Community Structures"
-format: revealjs
+author: "Seth Berry"
+format:
+  revealjs:
+    incremental: true
+    transition: fade
+    background-transition: fade
+    theme: serif
 ---
 
 ## What Is A Network?
@@ -18,12 +24,11 @@ format: revealjs
 
 - Networks also appear in computer science, engineering, and telecommunications.
 
+## Prior Research: Networks
 
-## Prior Research: Networks and Graph Theory
+- Networks have been used to study a wide range of phenomena, from the spread of information and diseases to the structure of social and economic systems.
 
 ## Networks and Organizational Functioning
-
-- The use of networks in organizational research dates back to the 1970s. 
 
 - A review of 187 articles by Chen et al. (2022) found 3 main categories of network dynamics research in organizations:
 
@@ -45,6 +50,52 @@ format: revealjs
 
 - Promiscuity in the context of networks refers to the tendency of songwriters to collaborate with a large number of different partners, rather than focusing on a small, stable group.
 
+## Hypotheses
+
+$H_1$: Strong communities will appear within the songwriter network, indicating that certain groups of songwriters frequently collaborate with each other.
+
+$H_2$: Promiscuity will be normally distributed across the entire network.
+
+$H_3$: Songwriters with higher centrality measures (e.g., degree, betweenness) will have a greater influence on the overall structure of the network, potentially acting as bridges between different communities. 
+
+$H_4$: Songwriter performance will be positively related to centrality measures. 
+
+## {background-image="weighted_network.png" background-size="cover" background-position="center center"}
+
+# Methods
+
+## Data Collection
+
+- Data was collected from the Billboard Hot 100 charts.
+
+- Data collection spanned from 1960 to 2026. 
+
+- Songwriters, producers, chart entry position, and peak position were collected for each song.
+
+## Descriptive Statistics
+
+- The data contains 27138 unique songs, with 13791 nodes and 80303 edges. 
+
+## Network Construction
+
+- A bipartite network was constructed with songwriters as nodes and edges representing collaborations.
+
+- Edges were weighted based on the number of collaborations between songwriters.
+
+## Community Detection
+
+- The Louvain method was applied to detect communities within the songwriter network.
+
+- **Modularity** was calculated to assess the strength of the detected communities.
+
+- Modularity is the fraction of the edges that fall within the given groups minus the expected fraction if edges were distributed at random.
+
+- Modularity values range from -1/2 to 1, with higher values indicating stronger community structure.
+
+## Detecting Promiscuity
+
+- Promiscuity was measured using the promiscuity index, which quantifies the extent to which nodes are distributed across multiple communities.
+
 - $\psi_i = \frac{k_i}{K}$
 
 - $k_i$: The number of unique communities to which node i belongs.
@@ -53,23 +104,39 @@ format: revealjs
 
 - A high score of 1 means the node participates in every single community in the network, while a low score means its allegiance is highly localized.
 
-## Hypotheses
+# Results
 
-H_1: Strong communities will appear within the songwriter network, indicating that certain groups of songwriters frequently collaborate with each other.
+## Community Detection
 
-H_2: Promiscuity will be normally distributed across the entire network.
+- 644 communities were detected within the songwriter network. 
 
-H_3: Songwriters with higher centrality measures (e.g., degree, betweenness) will have a greater influence on the overall structure of the network, potentially acting as bridges between different communities. 
+- The modularity score of the detected communities was 0.602, indicating a strong level of community structure.
 
-H_4: Songwriter performance will be positively related to centrality measures. 
+- Average Clustering Coefficient: 0.730
 
-##
+## Promiscuity Distribution {center}
 
-![](weighted_network.png)
+```{python}
+#| echo: false
+import joblib
+import pandas as pd
+import altair as alt
 
+louvain_communities, modularity, assortativity, promiscuity_scores, betweeness_centrality, degree_centrality, clustering_coefficient = joblib.load("network_analysis_results.pkl")
+
+promiscuity_df = pd.DataFrame(list(promiscuity_scores.items()), columns=['Node', 'Promiscuity'])
+
+alt.Chart(promiscuity_df).mark_point().encode(
+    x='Horsepower',
+    y='Miles_per_Gallon',
+    color='Origin',
+).interactive()
+```
 
 ## Implications
 
 ## Future Research
 
 - Transition from static promiscuity and flexibility to dynamic measures that capture changes over time. 
+
+    - Burstiness 
