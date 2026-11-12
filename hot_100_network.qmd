@@ -75,7 +75,9 @@ $H_1$: Strong communities will appear within the songwriter network, indicating 
 
 $H_2$: Promiscuity will be normally distributed across the entire network.
 
-$H_3$: Songwriter performance will be positively related to promiscuity. Specifically, more promiscuous songwriters will have higher chart performance, as measured by the number of songs that reach the Billboard Hot 100. 
+$H_3$: Promiscuity will exhibit a direct effect on longevity and number of collaborations
+
+## {background-image="causal_model.png" background-size="cover" background-position="center center"}
 
 ## {background-image="weighted_network.png" background-size="cover" background-position="center center"}
 
@@ -166,8 +168,20 @@ alt.Chart(summary_stats).mark_circle().encode(
 
 ## Implications
 
-## Future Research
+## Additional Research
 
-- Transition from static promiscuity and flexibility to dynamic measures that capture changes over time. 
+- Transition from static promiscuity to dynamic measures that capture changes over time. 
 
     - Burstiness 
+
+    - Community evolution
+
+## Limitations
+
+- A very narrow definition of success. 
+
+- Ignoring the world outside of the Billboard Hot 100.
+
+    - Non-chartings songs
+
+    - Other Billboard charts

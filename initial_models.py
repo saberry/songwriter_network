@@ -1,12 +1,12 @@
 import pandas as pd
 import statsmodels.formula.api as smf
 
-summary_stats = pd.read_csv("songwriter_summary.csv")
-promiscuity_stats = pd.read_csv("artist_promiscuity.csv")
+# summary_stats = pd.read_csv("songwriter_summary.csv")
+# promiscuity_stats = pd.read_csv("artist_promiscuity.csv")
 
-summary_stats['songwriter'] = summary_stats['songwriter'].str.lower()
-summary_stats = summary_stats.merge(promiscuity_stats, left_on='songwriter', right_on='Node', how='left')
-summary_stats.to_csv("songwriter_summary.csv", index=False)
+# summary_stats['songwriter'] = summary_stats['songwriter'].str.lower()
+# summary_stats = summary_stats.merge(promiscuity_stats, left_on='songwriter', right_on='Node', how='left')
+# summary_stats.to_csv("songwriter_summary.csv", index=False)
 
 summary_stats = pd.read_csv("songwriter_summary.csv")
 summary_stats = summary_stats.dropna()
@@ -16,6 +16,58 @@ summary_stats['Promiscuity_scaled'] = summary_stats['Promiscuity'] - summary_sta
 summary_stats['collab_scaled'] = summary_stats['num_collaborators'] - summary_stats['num_collaborators'].mean()
 model = smf.negativebinomial(formula="num_appearances ~ Promiscuity", data=summary_stats, loglike_method='nb2').fit(cov_type='HC3',maxiter=5000)
 print(model.summary())
+
+model = smf.negativebinomial(formula="duration_years ~ Promiscuity", data=summary_stats, loglike_method='nb2').fit(cov_type='HC3',maxiter=5000)
+print(model.summary())
+
+import networkx as nx
+causal_graph = nx.DiGraph([('Promiscuity', 'num_collaborators'), ('num_collaborators', 'duration_years')])
+
+from dowhy import gcm
+from dowhy import CausalModel
+
+model_string = '''
+digraph  {
+    Promiscuity -> num_collaborators;
+    Promiscuity -> duration_years;
+    num_collaborators -> num_appearances;
+    avg_peak_position -> num_appearances;
+    avg_debut_position -> num_appearances;
+    num_appearances -> duration_years;
+}
+'''
+
+
+model= CausalModel(
+        data=summary_stats,
+        graph=model_string, 
+        treatment='Promiscuity',
+        outcome='duration_years'
+        )
+model.view_model(layout="dot")
+
+identified_estimand = model.identify_effect(proceed_when_unidentifiable=True)
+
+estimate = model.estimate_effect(identified_estimand,
+        method_name="backdoor.linear_regression")
+print("Causal Estimate is " + str(estimate.value))
+
+import dowhy.plotter
+dowhy.plotter.plot_causal_effect(estimate, summary_stats["Promiscuity"], summary_stats["duration_years"])
+
+res_random=model.refute_estimate(identified_estimand, estimate, method_name="random_common_cause")
+print(res_random)
+
+res_placebo=model.refute_estimate(identified_estimand, estimate,
+        method_name="placebo_treatment_refuter", placebo_type="permute")
+print(res_placebo)
+
+res_subset=model.refute_estimate(identified_estimand, estimate,
+        method_name="data_subset_refuter", subset_fraction=0.9)
+print(res_subset)
+
+
+
 
 pearson_chi2 = (model.resid_pearson ** 2).sum()
 df_resid = model.df_resid
