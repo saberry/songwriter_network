@@ -24,9 +24,14 @@ format:
 
 - Networks also appear in computer science, engineering, and telecommunications.
 
-## Prior Research: Networks
+## 
 
-- Networks have been used to study a wide range of phenomena, from the spread of information and diseases to the structure of social and economic systems.
+<section 
+  data-background-iframe="small_network_graph.html" 
+  data-background-interactive>
+</section>
+
+# Prior Research
 
 ## Networks and Organizational Functioning
 
@@ -38,17 +43,31 @@ format:
 
 3. **Coevolution**: The network and actor attributes influence each other over time.
 
+## Networks and Innovation
+
+- Muller and Perez (2019) found that innovation growth is effect when networks follow the "3 Cs":
+
+    - Cohesion (strong mutual influence among its members)
+    
+    - Connectedness (high number of ties)
+    
+    - Conciseness (low redundancy)
+
 ## Network Communities
 
 - Network communities are groups of nodes that are more densely connected to each other than to the rest of the network.
 
-- Communities can be detected using various algorithms, such as the Louvain method, which optimizes modularity to identify clusters of nodes.
+- Sytch and Tatarynowicz (2013) found that network communities can be a source increased patent productivity. 
 
 ## Community Promiscuity
 
 - Community promiscuity refers to the extent to which nodes are distributed across multiple communities within the network.
 
-- Promiscuity in the context of networks refers to the tendency of songwriters to collaborate with a large number of different partners, rather than focusing on a small, stable group.
+- Promiscuity in the context of networks refers to the tendency of nodes to collaborate with a large number of different partners, rather than focusing on a small, stable group.
+
+## Finding Gaps in Promiscuity Research 
+
+- While there has been research on network communities and their impact on innovation, there is a lack of research on the role of promiscuity in network structures.
 
 ## Hypotheses
 
@@ -56,9 +75,7 @@ $H_1$: Strong communities will appear within the songwriter network, indicating 
 
 $H_2$: Promiscuity will be normally distributed across the entire network.
 
-$H_3$: Songwriters with higher centrality measures (e.g., degree, betweenness) will have a greater influence on the overall structure of the network, potentially acting as bridges between different communities. 
-
-$H_4$: Songwriter performance will be positively related to centrality measures. 
+$H_3$: Songwriter performance will be positively related to promiscuity. Specifically, more promiscuous songwriters will have higher chart performance, as measured by the number of songs that reach the Billboard Hot 100. 
 
 ## {background-image="weighted_network.png" background-size="cover" background-position="center center"}
 
@@ -78,7 +95,7 @@ $H_4$: Songwriter performance will be positively related to centrality measures.
 
 ## Network Construction
 
-- A bipartite network was constructed with songwriters as nodes and edges representing collaborations.
+- An undirected, bipartite network was constructed with songwriters as nodes and edges representing collaborations.
 
 - Edges were weighted based on the number of collaborations between songwriters.
 
@@ -114,22 +131,36 @@ $H_4$: Songwriter performance will be positively related to centrality measures.
 
 - Average Clustering Coefficient: 0.730
 
-## Promiscuity Distribution {center}
+## Promiscuity Distribution {.center}
 
 ```{python}
 #| echo: false
-import joblib
 import pandas as pd
 import altair as alt
+alt.data_transformers.enable("vegafusion")
+promiscuity_df = pd.read_csv("artist_promiscuity.csv")
 
-louvain_communities, modularity, assortativity, promiscuity_scores, betweeness_centrality, degree_centrality, clustering_coefficient = joblib.load("network_analysis_results.pkl")
+alt.Chart(promiscuity_df).mark_bar().encode(
+    alt.X("Promiscuity:Q", bin=True),
+    y='count()',
+).properties(
+    width=700,
+    height=300
+).interactive()
+```
 
-promiscuity_df = pd.DataFrame(list(promiscuity_scores.items()), columns=['Node', 'Promiscuity'])
+## Connectivity and Performance
 
-alt.Chart(promiscuity_df).mark_point().encode(
-    x='Horsepower',
-    y='Miles_per_Gallon',
-    color='Origin',
+```{python}
+#| echo: false
+summary_stats = pd.read_csv("songwriter_summary.csv")
+
+alt.Chart(summary_stats).mark_circle().encode(
+    x='Promiscuity',
+    y='num_appearances',
+).properties(
+    width=700,
+    height=300
 ).interactive()
 ```
 
