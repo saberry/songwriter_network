@@ -42,6 +42,16 @@ format:
   data-background-interactive>
 </section>
 
+## Centrality
+
+- Centrality measures are used to identify the most important nodes in a network.
+
+- **Degree**: The number of edges connected to a node.
+
+- **Betweenness**: The extent to which a node lies on paths between other nodes.
+
+- **Closeness**: The average shortest path distance from a node to all other nodes.
+
 # Prior Research
 
 ## Organizational Functioning
@@ -110,30 +120,7 @@ Does promiscuity lead to success as a songwriter?
 
 - $H_2$: Promiscuity will be normally distributed across the entire network.
 
-- $H_3$: Promiscuity will exhibit a direct effect on longevity and number of collaborations
-
-## {.center auto-animate=true}
-
-::: {style="text-align: center;"}
-
-```{mermaid}
-flowchart TB
-  A[Promiscuity] --> B[Number of Appearances]
-```
-
-:::
-
-## {.center auto-animate=true}
-
-::: {style="text-align: center;"}
-
-```{mermaid}
-flowchart TB
-  A[Promiscuity] --> B[Number of Appearances]
-  B --> C[Duration in Years]
-```
-
-:::
+- $H_3$: Promiscuity will exhibit a direct effect on longevity.
 
 # Methods
 
@@ -185,6 +172,39 @@ flowchart TB
 
 - A high score of 1 means the node participates in every single community in the network, while a low score means its allegiance is highly localized.
 
+## Causal Model
+
+- A causal model was constructed to examine the average treatment effect of promiscuity on the number of appearances and duration in years.
+
+- The model uses *do*-calculus to estimate the causal effect of the treatment variable (promiscuity) on the outcome variable (duration in years).
+
+- The model was estimated with the **backdoor** criterion, which controls for confounding variables that may affect both the treatment and outcome variables.
+
+
+## {.center auto-animate=true}
+
+::: {style="text-align: center;"}
+
+```{mermaid}
+flowchart TB
+  A[Promiscuity] --> B[Number of Appearances]
+```
+
+:::
+
+## {.center auto-animate=true}
+
+::: {style="text-align: center;"}
+
+```{mermaid}
+flowchart TB
+  A[Promiscuity] --> B[Number of Appearances]
+  B --> C[Duration in Years]
+```
+
+:::
+
+
 # Results
 
 ## Community Detection
@@ -193,7 +213,7 @@ flowchart TB
 
 - The modularity score was 0.602
 
-- The Average Clustering Coefficient 0.730.
+- The average clustering coefficient 0.730.
 
 - Strong support for $H_1$. 
 
@@ -223,13 +243,19 @@ alt.Chart(promiscuity_df).mark_bar().encode(
 
 ## Causal Model Average Treatment Effects
 
-- Moving from a promiscuity score of 0 to .5:
-    
-    - Average treatment effect = 6.41 (*p*-value < .01).
+```{python}
+#| echo: false
+import itables
+itables.init_notebook_mode(all_interactive=True)
 
-- Moving from a promiscuity score of .5 to .9:
-    
-    - Average treatment effect = 5.13 (*p*-value < .01).
+data = {
+    "Control/Treatment": ["0-.5", ".5-.9", "0-.9"], 
+    "Value": ["6.41", "5.13", "12.28"],
+    "p-value": ["< .01", "< .01", "< .01"]
+}
+
+itables.show(pd.DataFrame(data), "ate = 6.41")
+```
 
 - $H_3$ is supported.
 
@@ -249,7 +275,32 @@ data = {
 itables.show(pd.DataFrame(data), "ate = 6.41")
 ```
 
-- All results support the causal model.
+- All results further support the causal model.
+
+## Robustness Checks
+
+- Using `number of appearances` as a mediator is a design choice. 
+
+- But that doesn't mean that I'm right.
+
+- It is completely possible, though, that it serves as a confounder.
+
+## 
+
+::: {style="text-align: center;"}
+
+```{mermaid}
+flowchart TD
+  A[Number of Appearances] --> B[Promiscuity]
+  A --> C[Duration in Years]
+  B --> C
+```
+
+:::
+
+## Changes?
+
+
 
 ## Implications
 

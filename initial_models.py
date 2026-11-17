@@ -9,15 +9,22 @@ import statsmodels.formula.api as smf
 # summary_stats.to_csv("songwriter_summary.csv", index=False)
 
 summary_stats = pd.read_csv("songwriter_summary.csv")
-summary_stats = summary_stats.dropna()
+#summary_stats = summary_stats.dropna()
 summary_stats = summary_stats.reset_index(drop=True)
 # center and scale collaborators and promiscuity for the regression model
 summary_stats['Promiscuity_scaled'] = summary_stats['Promiscuity'] - summary_stats['Promiscuity'].mean()
 summary_stats['collab_scaled'] = summary_stats['num_collaborators'] - summary_stats['num_collaborators'].mean()
-model = smf.negativebinomial(formula="num_appearances ~ Promiscuity + avg_debut_position", data=summary_stats, loglike_method='nb2').fit(cov_type='HC3',maxiter=5000)
-print(model.summary())
+# model = smf.negativebinomial(formula="num_appearances ~ Promiscuity + avg_debut_position", data=summary_stats, loglike_method='nb2').fit(cov_type='HC3',maxiter=5000)
+# print(model.summary())
 
-model = smf.negativebinomial(formula="duration_years ~ Promiscuity", data=summary_stats, loglike_method='nb2').fit(cov_type='HC3',maxiter=5000)
+model = smf.poisson(
+    formula="duration_years ~ Promiscuity + centrality_score", 
+    data=summary_stats
+    ).fit(
+        cov_type='HC3',
+        maxiter=5000
+        )
+
 print(model.summary())
 
 import networkx as nx
@@ -33,11 +40,22 @@ digraph  {
 }
 '''
 
+model_string = '''
+digraph  {
+    num_appearances -> duration_years;
+    num_appearances -> Promiscuity;
+    Promiscuity -> duration_years;
+}
+'''
+
+model_data = summary_stats[['Promiscuity', 'num_appearances', 'duration_years']].dropna()
+
 model = CausalModel(
-        data=summary_stats,
+        data=model_data,
         graph=model_string, 
         treatment='Promiscuity',
-        outcome='duration_years'
+        outcome='duration_years', 
+        common_causes=['num_appearances']
 )
 
 model.view_model(layout="dot")
@@ -49,8 +67,8 @@ estimate = model.estimate_effect(
     method_name="backdoor.linear_regression", 
     test_significance=True,
     confidence_intervals=True,
-    control_value=.0,  # Baseline treatment level
-    treatment_value=.95,
+    control_value=.5,  # Baseline treatment level
+    treatment_value=.9,
     method_params={
         "confidence_level": 0.9,
         "num_simulations": 100,       # For confidence intervals
